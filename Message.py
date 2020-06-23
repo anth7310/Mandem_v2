@@ -1,7 +1,8 @@
 class Message:
     def __init__(self, sender_name = None, timestamp_ms = None, content = None, message_type = None):
         """
-        
+        hi
+
         sender_name - name of sender
         timestamp_ms - time message was sent
         content - content of message
