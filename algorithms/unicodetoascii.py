@@ -1,5 +1,6 @@
 CHARS = (
     (b'\xc3\xa2\xc2\x80\xc2\x99', b'\''),
+    (b'\xc3\xb0\xc2\x9f\xc2\x98\xc2\x90', b':neutral_face:'), # 😐
     # (b'\xc3\xb0\xc2\x9f\xc2\xa4\xc2\x94', '🤔')
     # ('\xc3\xa9', 'e'),
     # ('\xe2\x80\x90', '-'),
@@ -31,6 +32,7 @@ CHARS = (
 
 
 def unicodetoascii(data):
+    data = data.encode()
     for _hex, _char in CHARS:
-        data = data.encode().replace(_hex, _char)
+        data = data.replace(_hex, _char)
     return data.decode()
