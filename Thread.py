@@ -57,11 +57,15 @@ class Thread:
                 results.append(msg)
         return results
 
-    def messages(self) -> list:
+    def messages(self, participant = None) -> list:
         """
         Return messages as list
+        If participant not None, return all messages by participant
         """
-        msgs = [ x['content'] for i, x in enumerate(self.data['messages']) if 'content' in x ]
+        if participant == None:
+            msgs = [ x['content'] for i, x in enumerate(self.data['messages']) if 'content' in x ]
+        else:
+            msgs = [ x['content'] for i, x in enumerate(self.data['messages']) if 'content' in x and x['sender_name'] == participant ]
         return msgs
 
     def participants(self):
@@ -104,6 +108,9 @@ class Thread:
         datetime_start = datetime.fromtimestamp(ts_start/1000.0)
         datetime_end = datetime.fromtimestamp(ts_end/1000.0)
         return str(datetime_start), str(datetime_end)
+    
+    def extract_emojis(self, s):
+        return ''.join(c for c in s if c in BYTES_EMOJI)
 
 if __name__ == '__main__':
     pass
