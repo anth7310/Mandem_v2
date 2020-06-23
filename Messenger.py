@@ -27,15 +27,6 @@ class Messenger:
         else:
             self.threads[new_thread.title] = new_thread
     
-    def _get_thread(self, thread_name):
-        """
-        Return the thread with the given thread_name
-        If thread_name does not exist, return None
-        """
-        if thread_name in self.threads:
-            return self.threads[thread_name]
-        return None
-    
     def thread_names(self):
         """
         Return list of thread titles
