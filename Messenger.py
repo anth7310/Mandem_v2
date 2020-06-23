@@ -6,6 +6,15 @@ from datetime import datetime
 class Messenger:
     def __init__(self):
         self.threads = dict()
+    
+    def __getitem__(self, key):
+        """
+        Return thread with given key.
+        If no thread exists, return None
+        """
+        if key in self.thread_names():
+            return self.threads[key]
+        return None
 
     def add_thread(self, thread_path, thread_name = None):
         """
@@ -18,6 +27,15 @@ class Messenger:
         else:
             self.threads[new_thread.title] = new_thread
     
+    def _get_thread(self, thread_name):
+        """
+        Return the thread with the given thread_name
+        If thread_name does not exist, return None
+        """
+        if thread_name in self.threads:
+            return self.threads[thread_name]
+        return None
+    
     def thread_names(self):
         """
         Return list of thread titles
@@ -25,6 +43,16 @@ class Messenger:
         return list(self.threads.keys())
 
     def search(self, phrase, title=None):
+        """
+        Search for the given phrase in the thread with the title
+        If title is None, return list of all messages with phrase
+        """
+        # if title == None:
+        #     pass
+        # elif title in self.thread_names():
+        #     thread = self._get_thread(title)
+        # else:
+        #     return None
         pass
 
     def vocabulary(self):
@@ -45,7 +73,7 @@ if __name__ == '__main__':
     print(x.thread_names())
     thread_name = x.thread_names()[0]
 
-    print(x.threads[thread_name].messages()[1])
+    print(x[thread_name].messages()[1])
     
 
     # all participants in thread
@@ -58,4 +86,4 @@ if __name__ == '__main__':
     #     print(x.threads[thread_name].number_messages(p), p)
 
     # span of thread
-    print(x.threads[thread_name].span())
+    # print(x.threads[thread_name].span())
