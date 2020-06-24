@@ -32,7 +32,9 @@ CHARS = (
 
 
 def unicodetoascii(data):
-    data = data.encode()
-    for _hex, _char in CHARS:
-        data = data.replace(_hex, _char)
-    return data.decode()
+    # data = data.encode()
+    # for _hex, _char in CHARS:
+    #     data = data.replace(_hex, _char)
+    # return data.decode()
+    return data.encode('ascii', 'replace').decode()
+    
