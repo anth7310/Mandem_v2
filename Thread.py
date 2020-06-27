@@ -117,7 +117,9 @@ class Thread:
         """
         Return list of all participants
         """
-        return [ obj['name'] for obj in self.data['participants'] ]
+
+        p = set([ msg['sender_name'] for msg in self.data['messages'] ])
+        return list(p)
     
     def title(self):
         """
@@ -166,9 +168,7 @@ class Thread:
 
 if __name__ == '__main__':
     import plotly.graph_objects as go
-    import numpy as np
     from datetime import datetime
-    from datetime import timedelta
     
 
     # np.random.seed(1)
@@ -182,8 +182,8 @@ if __name__ == '__main__':
     # count number messages per participant
     # create matrix using dictionary to store all values
     dmys = [(date.year, date.month, date.day) for date in dates]
-    # print(sorted(list(set(dmys))))
     d = dict()
+    print(participants)
     for p in participants:
         d[p] = dict()
         for date in set(dmys):
@@ -193,17 +193,16 @@ if __name__ == '__main__':
         date = datetime.fromtimestamp(msg.timestamp_ms/1000.0)
         # keep count by day, month, year
         dmy = (date.year,  date.month, date.day)
-        p = msg.sender_name
-        if p == 'Richard Zhen':
-            continue
+        p = msg.sender_name # participant name
         if dmy in d[p]:
             d[p][dmy] += 1
 
-    # message count for each date
+    # message count for each date as matrix (participant, datetime)
     z = []
     for p in participants:
         z.append([ d[p][v] for v in sorted(d[p].keys(), reverse=False) ])
-    # print(z[p])
+
+    # datetime objects are required for Heatmap figure in plotly
     dates = sorted([datetime(year, month, day) for (year, month, day) in set(dmys)])
     fig = go.Figure(data=go.Heatmap(
             z=z,
