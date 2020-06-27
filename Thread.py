@@ -119,7 +119,7 @@ class Thread:
         """
 
         p = set([ msg['sender_name'] for msg in self.data['messages'] ])
-        return list(p)
+        return sorted(list(p), reverse=True)
     
     def title(self):
         """
@@ -174,26 +174,24 @@ if __name__ == '__main__':
     # np.random.seed(1)
     x = Thread('./threads/mandam.json')
     print(x.span())
-    msg_list = x._create_message_list()
-
-    participants = sorted(x.participants(), reverse=True)
-    dates = [datetime.fromtimestamp(msg.timestamp_ms/1000.0) for msg in msg_list]
+    msgs = x.data['messages']
+    participants = x.participants()
+    dates = [datetime.fromtimestamp(msg['timestamp_ms']/1000.0) for msg in msgs]
 
     # count number messages per participant
     # create matrix using dictionary to store all values
     dmys = [(date.year, date.month, date.day) for date in dates]
     d = dict()
-    print(participants)
     for p in participants:
         d[p] = dict()
         for date in set(dmys):
             d[p][date] = 0
 
-    for msg in msg_list:
-        date = datetime.fromtimestamp(msg.timestamp_ms/1000.0)
+    for msg in msgs:
+        date = datetime.fromtimestamp(msg['timestamp_ms']/1000.0)
         # keep count by day, month, year
         dmy = (date.year,  date.month, date.day)
-        p = msg.sender_name # participant name
+        p = msg['sender_name'] # participant name
         if dmy in d[p]:
             d[p][dmy] += 1
 
