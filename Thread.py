@@ -155,12 +155,10 @@ class Thread:
         """
         Return the span of the conversation history
         """
-        msg_len = len(self.data['messages'])
-        ts_start = self.data['messages'][msg_len-1]['timestamp_ms']
-        ts_end = self.data['messages'][0]['timestamp_ms']
-
-        datetime_start = datetime.fromtimestamp(ts_start/1000.0)
-        datetime_end = datetime.fromtimestamp(ts_end/1000.0)
+        msgs = [datetime.fromtimestamp(msg['timestamp_ms']/1000.0) for msg in self.data['messages']]
+    
+        datetime_start = min(msgs)
+        datetime_end = max(msgs)
         return str(datetime_start), str(datetime_end)
     
     def extract_emojis(self, s):
@@ -170,35 +168,55 @@ if __name__ == '__main__':
     import plotly.graph_objects as go
     from datetime import datetime
     
-
-    # np.random.seed(1)
     x = Thread('./threads/mandam.json')
     print(x.span())
-    msgs = x.data['messages']
+
+    # helper function, enables if only include text or images
+    def f(x):
+        # return True
+        return 'content' in x
+    msgs = [msg for msg in x.data['messages'] if f(msg)]
     participants = x.participants()
-    dates = [datetime.fromtimestamp(msg['timestamp_ms']/1000.0) for msg in msgs]
+    dates = [datetime.fromtimestamp(msg['timestamp_ms']/1000.0) for msg in msgs if f(msg)]
 
     # count number messages per participant
     # create matrix using dictionary to store all values
     dmys = [(date.year, date.month, date.day) for date in dates]
-    d = dict()
+    d, q = dict(), dict()
     for p in participants:
-        d[p] = dict()
+        d[p], q[p] = dict(), dict()
         for date in set(dmys):
-            d[p][date] = 0
+            d[p][date], q[p][date] = 0, ""
 
     for msg in msgs:
         date = datetime.fromtimestamp(msg['timestamp_ms']/1000.0)
         # keep count by day, month, year
         dmy = (date.year,  date.month, date.day)
         p = msg['sender_name'] # participant name
-        if dmy in d[p]:
-            d[p][dmy] += 1
+        d[p][dmy] += 1
 
+    for msg in msgs:
+        date = datetime.fromtimestamp(msg['timestamp_ms']/1000.0)
+        # keep count by day, month, year
+        dmy = (date.year,  date.month, date.day)
+        p = msg['sender_name'] # participant name
+
+        if 'content' in msg: # add msg
+            if q[p][dmy] == "": # add date
+                q[p][dmy] += 'Participant: ' + p + '<br />'
+                q[p][dmy] += 'Date: ' + str(date) + '<br />'
+                q[p][dmy] += 'Count: ' + str(d[p][dmy])
+            else:
+                q[p][dmy] += '<br />' + msg['content']
+        
+    
     # message count for each date as matrix (participant, datetime)
-    z = []
+    z, b = [], []
     for p in participants:
         z.append([ d[p][v] for v in sorted(d[p].keys(), reverse=False) ])
+        # display messages, only first 1000 characters
+        b.append([ q[p][v][:1000] for v in sorted(q[p].keys(), reverse=False) ])
+
 
     # datetime objects are required for Heatmap figure in plotly
     dates = sorted([datetime(year, month, day) for (year, month, day) in set(dmys)])
@@ -206,6 +224,8 @@ if __name__ == '__main__':
             z=z,
             x=dates,
             y=participants,
+            hoverinfo='text',
+            text=b, # display messages
             colorscale='Viridis'))
 
     fig.update_layout(
