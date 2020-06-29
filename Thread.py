@@ -167,6 +167,7 @@ class Thread:
 if __name__ == '__main__':
     import plotly.graph_objects as go
     from datetime import datetime
+    from datetime import timedelta
     
     x = Thread('./threads/hack.json')
     print(x.span())
@@ -175,12 +176,28 @@ if __name__ == '__main__':
     def f(x):
         # return True
         return 'content' in x
+
+
     msgs = [msg for msg in x.data['messages'] if f(msg)]
-    participants = x.participants()
-    dates = [datetime.fromtimestamp(msg['timestamp_ms']/1000.0) for msg in msgs if f(msg)]
+    # start and end dates
+    s=datetime.fromtimestamp(msgs[-1]['timestamp_ms']/1000.0)
+    e=datetime.fromtimestamp(msgs[0]['timestamp_ms']/1000.0)
+
+
+    # count all dates in between
+    dates = []
+    date = s
+    while date < e:
+        dates.append(date)
+        date += timedelta(days=1)
+    dates.append(date)
+
+    
+    # dates = [datetime.fromtimestamp(msg['timestamp_ms']/1000.0) for msg in msgs if f(msg)]
 
     # count number messages per participant
     # create matrix using dictionary to store all values
+    participants = x.participants()
     dmys = [(date.year, date.month, date.day) for date in dates]
     d, q = dict(), dict()
     for p in participants:
@@ -232,4 +249,5 @@ if __name__ == '__main__':
         title='Messages sent per day in {}'.format(x.title),
         xaxis_nticks=36) # 36
 
-    fig.show()
+    fig.write_html("./interactivegraphs/{}.html".format(x.title)) # save to html file
+    # fig.show() # display on html
