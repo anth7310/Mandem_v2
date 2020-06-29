@@ -168,7 +168,7 @@ if __name__ == '__main__':
     import plotly.graph_objects as go
     from datetime import datetime
     
-    x = Thread('./threads/mandam.json')
+    x = Thread('./threads/hack.json')
     print(x.span())
 
     # helper function, enables if only include text or images
@@ -215,7 +215,7 @@ if __name__ == '__main__':
     for p in participants:
         z.append([ d[p][v] for v in sorted(d[p].keys(), reverse=False) ])
         # display messages, only first 1000 characters
-        b.append([ q[p][v][:1000] for v in sorted(q[p].keys(), reverse=False) ])
+        b.append([ q[p][v][:500] for v in sorted(q[p].keys(), reverse=False) ])
 
 
     # datetime objects are required for Heatmap figure in plotly
